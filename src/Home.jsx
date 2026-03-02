@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ProductsPanel from './components/ProductsPanel';
 import AboutPanel from './components/AboutPanel';
 import BlogPanel from './components/BlogPanel';
@@ -27,62 +25,55 @@ const NAV = [
   { id: "events",   label: "Events",   icon: "◷" },
 ];
 
-
-
-
-
-
-
-
-
-
 // ── CART DRAWER ───────────────────────────────
 function CartDrawer({ cart, open, onClose }) {
   return (
     <>
-      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 90, backdropFilter: "blur(4px)" }} />}
-      <div style={{ position: "fixed", top: 0, right: 0, height: "100%", width: "min(360px,100vw)",
-        background: "#050c0d", borderLeft: "1px solid #0c1a1c",
-        transform: open?"translateX(0)":"translateX(100%)",
-        transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
-        zIndex: 100, display: "flex", flexDirection: "column", padding: "2rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-          <h2 style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "2rem", color: "#e8eded", letterSpacing: "0.08em" }}>Cart</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "#4ecdc4", fontSize: "1rem", cursor: "pointer" }}>✕</button>
+      {/* Backdrop */}
+      <div 
+        onClick={onClose} 
+        className={`fixed inset-0 bg-black/65 z-50 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} 
+      />
+      
+      {/* Drawer */}
+      <div 
+        className={`fixed top-0 right-0 h-full w-[min(360px,100vw)] bg-[#050c0d] border-l border-[#0c1a1c] z-[60] flex flex-col p-8 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "translate-x-0" : "translate-x-full"}`}
+      >
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="font-['Bebas_Neue',sans-serif] text-3xl text-[#e8eded] tracking-[0.08em]">Cart</h2>
+          <button onClick={onClose} className="text-[#4ecdc4] text-lg hover:text-[#6edbd3] transition-colors">✕</button>
         </div>
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {cart.items.length === 0
-            ? <p style={{ fontFamily: "'DM Mono',monospace", color: "#152426", fontSize: "0.62rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>Your cart is empty.</p>
-            : cart.items.map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
-                borderBottom: "1px solid #0c1a1c", paddingBottom: "1rem", marginBottom: "1rem" }}>
+        
+        <div className="flex-1 overflow-y-auto">
+          {cart.items.length === 0 ? (
+            <p className="font-mono text-[#152426] text-[0.62rem] tracking-[0.15em] uppercase">Your cart is empty.</p>
+          ) : (
+            cart.items.map((item) => (
+              <div key={item.id} className="flex justify-between items-center border-b border-[#0c1a1c] pb-4 mb-4">
                 <div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "1.1rem", color: "#e8eded", letterSpacing: "0.06em" }}>{item.name}</div>
-                  <div style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.5rem", color: "#253637", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: "3px" }}>
+                  <div className="font-['Bebas_Neue',sans-serif] text-lg text-[#e8eded] tracking-[0.06em]">{item.name}</div>
+                  <div className="font-mono text-[0.5rem] text-[#253637] tracking-[0.12em] uppercase mt-1">
                     Qty: {item.qty} · {item.price}
                   </div>
                 </div>
-                <button onClick={() => cart.remove(item.id)}
-                  style={{ background: "none", border: "none", color: "#152426", cursor: "pointer", fontSize: "0.8rem", transition: "color 0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color="#4ecdc4"}
-                  onMouseLeave={e => e.currentTarget.style.color="#152426"}
+                <button 
+                  onClick={() => cart.remove(item.id)}
+                  className="text-[#152426] hover:text-[#4ecdc4] text-xs transition-colors"
                 >✕</button>
               </div>
             ))
-          }
+          )}
         </div>
+        
         {cart.items.length > 0 && (
-          <div style={{ borderTop: "1px solid #0c1a1c", paddingTop: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem", alignItems: "center" }}>
-              <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.52rem", letterSpacing: "0.2em", color: "#253637", textTransform: "uppercase" }}>Total</span>
-              <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: "1.8rem", color: "#e8eded", letterSpacing: "0.05em" }}>${cart.total.toFixed(2)}</span>
+          <div className="border-t border-[#0c1a1c] pt-6">
+            <div className="flex justify-between items-center mb-6">
+              <span className="font-mono text-[0.52rem] tracking-[0.2em] text-[#253637] uppercase">Total</span>
+              <span className="font-['Bebas_Neue',sans-serif] text-3xl text-[#e8eded] tracking-[0.05em]">${cart.total.toFixed(2)}</span>
             </div>
-            <button style={{ width: "100%", background: "#4ecdc4", border: "none", color: "#040a0a",
-              fontFamily: "'DM Mono',monospace", fontSize: "0.6rem", letterSpacing: "0.25em", textTransform: "uppercase",
-              padding: "14px", cursor: "pointer", transition: "background 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background="#6edbd3"}
-              onMouseLeave={e => e.currentTarget.style.background="#4ecdc4"}
-            >Checkout</button>
+            <button className="w-full bg-[#4ecdc4] hover:bg-[#6edbd3] text-[#040a0a] font-mono text-[0.6rem] tracking-[0.25em] uppercase py-3.5 transition-colors">
+              Checkout
+            </button>
           </div>
         )}
       </div>
@@ -115,19 +106,24 @@ export default function Home() {
     const leaveTo   = direction > 0 ? "-100%" : "100%";
     const entering = panelRefs.current[nextIdx];
     const leaving  = panelRefs.current[activeIdx];
+    
     if (!entering || !leaving) return;
+    
     entering.style.transform = `translate${axis}(${enterFrom})`;
     entering.style.opacity = "1";
     entering.style.zIndex = "2";
     leaving.style.zIndex = "1";
     leaving.style.opacity = "1";
-    entering.getBoundingClientRect();
-    const dur = 640;
+    
+    entering.getBoundingClientRect(); // Force reflow
+    
+    const dur = 400; // slightly smoothed out animation duration
     const ease = "cubic-bezier(0.16,1,0.3,1)";
     entering.style.transition = `transform ${dur}ms ${ease}`;
     leaving.style.transition  = `transform ${dur}ms ${ease}`;
     entering.style.transform = `translate${axis}(0%)`;
     leaving.style.transform  = `translate${axis}(${leaveTo})`;
+    
     setTimeout(() => {
       panelRefs.current.forEach((el, i) => {
         if (!el) return;
@@ -142,111 +138,109 @@ export default function Home() {
   }, [activeIdx, animating, isMobile]);
 
   const PANELS = [
-    <AboutPanel />,
-    <ProductsPanel cart={cart} />,
-    <BlogPanel />,
-    <EventsPanel />
+    <AboutPanel key="about" />,
+    <ProductsPanel key="products" cart={cart} />,
+    <BlogPanel key="blog" />,
+    <EventsPanel key="events" />
   ];
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body, #root { height: 100%; overflow: hidden; background: #050b0c; }
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: #070e0f; }
-        ::-webkit-scrollbar-thumb { background: #152426; border-radius: 2px; }
-      `}</style>
-
-      <div style={{ display: "flex", height: "100vh", flexDirection: isMobile?"column":"row",
-        background: "#050b0c", color: "#e8eded", overflow: "hidden" }}>
-
-        {/* DESKTOP SIDEBAR */}
-        {!isMobile && (
-          <nav style={{ width: "68px", flexShrink: 0, borderRight: "1px solid #0a1618",
-            display: "flex", flexDirection: "column", alignItems: "center",
-            paddingTop: "1.8rem", paddingBottom: "1.8rem", background: "#040a0b", position: "relative", zIndex: 10 }}>
-            <div style={{ marginBottom: "3rem", writingMode: "vertical-rl", transform: "rotate(180deg)",
-              fontFamily: "'Bebas Neue',sans-serif", fontSize: "0.75rem", letterSpacing: "0.35em",
-              color: "#0d1e20", cursor: "default", userSelect: "none" }}>MISTY</div>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", width: "100%" }}>
-              {NAV.map((item, i) => (
-                <button key={item.id} onClick={() => navigate(i)} title={item.label}
-                  style={{ background: "none", border: "none", cursor: "pointer",
-                    display: "flex", flexDirection: "column", alignItems: "center",
-                    gap: "5px", padding: "14px 0", width: "100%",
-                    borderLeft: `2px solid ${activeIdx===i?"#4ecdc4":"transparent"}`,
-                    transition: "border-color 0.3s", position: "relative" }}>
-                  {activeIdx===i && <div style={{ position: "absolute", right: "9px", top: "50%", transform: "translateY(-50%)",
-                    width: "3px", height: "3px", borderRadius: "50%", background: "#4ecdc4" }} />}
-                  <span style={{ fontSize: "0.95rem", color: activeIdx===i?"#4ecdc4":"#152426", transition: "color 0.3s", lineHeight: 1 }}>{item.icon}</span>
-                  <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.38rem", letterSpacing: "0.18em",
-                    textTransform: "uppercase", color: activeIdx===i?"#4ecdc4":"#101e20", transition: "color 0.3s" }}>{item.label}</span>
-                </button>
-              ))}
-            </div>
-            <button onClick={() => setCartOpen(true)}
-              style={{ background: "none", border: "1px solid #0a1a1c", color: "#152426",
-                width: "36px", height: "36px", cursor: "pointer", display: "flex", alignItems: "center",
-                justifyContent: "center", position: "relative", transition: "all 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor="#4ecdc4"; e.currentTarget.style.color="#4ecdc4"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor="#0a1a1c"; e.currentTarget.style.color="#152426"; }}>
-              <span style={{ fontSize: "0.85rem" }}>⊛</span>
-              {cart.items.length > 0 && <span style={{ position: "absolute", top: "2px", right: "2px", width: "7px", height: "7px", borderRadius: "50%", background: "#4ecdc4" }} />}
+    // Strictly bounds the entire app to 100vw / 100vh. No scrolling allowed on the body.
+    <div className="flex h-screen w-screen flex-col md:flex-row bg-[#050b0c] text-[#e8eded] overflow-hidden">
+      
+      {/* DESKTOP SIDEBAR (hidden on mobile, flex on md+) */}
+      <nav className="hidden md:flex w-[100px] shrink-0 border-r border-[#0a1618] flex-col items-center py-7 bg-[#040a0b] relative z-20">
+        <div className="mb-12 [writing-mode:vertical-rl] rotate-180 font-['Bebas_Neue',sans-serif] text-xs tracking-[0.35em] text-[#0d1e20] cursor-default select-none">
+          MISTY
+        </div>
+        
+        <div className="flex-1 flex flex-col justify-center w-full">
+          {NAV.map((item, i) => (
+            <button 
+              key={item.id} 
+              onClick={() => navigate(i)} 
+              title={item.label}
+              className={`relative flex flex-col items-center justify-center gap-1.5 py-3.5 w-full aspect-square border-l-2 transition-colors duration-300 group ${activeIdx === i ? "border-[#4ecdc4]" : "border-transparent"}`}
+            >
+              {activeIdx === i && (
+                <div className="absolute right-[9px] top-1/2 -translate-y-1/2 w-[3px] h-[3px] rounded-full bg-[#4ecdc4]" />
+              )}
+              <span className="text-3xl text-[#4ecdc4] leading-none">{item.icon}</span>
+              <span className="font-mono text-[0.6rem] tracking-[0.18em] uppercase text-[#4ecdc4]">
+                {item.label}
+              </span>
             </button>
-          </nav>
-        )}
-
-        {/* PANELS */}
-        <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "1.2rem", right: "1.2rem", zIndex: 20,
-            display: "flex", alignItems: "center", gap: "0.8rem" }}>
-            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.48rem", letterSpacing: "0.28em", color: "#0d1e20", textTransform: "uppercase" }}>{NAV[activeIdx].label}</span>
-            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.48rem", letterSpacing: "0.2em", color: "#0a1618" }}>
-              {String(activeIdx+1).padStart(2,"0")} / {String(NAV.length).padStart(2,"0")}
-            </span>
-            {isMobile && (
-              <button onClick={() => setCartOpen(true)}
-                style={{ background: "none", border: "1px solid #0a1618", color: "#152426", width: "30px", height: "30px",
-                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                  position: "relative", transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="#4ecdc4"; e.currentTarget.style.color="#4ecdc4"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="#0a1618"; e.currentTarget.style.color="#152426"; }}>
-                <span style={{ fontSize: "0.75rem" }}>⊛</span>
-                {cart.items.length > 0 && <span style={{ position: "absolute", top: "2px", right: "2px", width: "5px", height: "5px", borderRadius: "50%", background: "#4ecdc4" }} />}
-              </button>
-            )}
-          </div>
-
-          {PANELS.map((panel, i) => (
-            <div key={i} ref={(el) => (panelRefs.current[i] = el)}
-              style={{ position: "absolute", inset: 0, opacity: i===0?1:0, zIndex: i===0?1:0, background: "#050b0c", overflow: "hidden" }}>
-              {panel}
-            </div>
           ))}
         </div>
+        
+        <button 
+          onClick={() => setCartOpen(true)}
+          className="w-9 h-9 flex items-center justify-center bg-[#4ecdc4] text-[#152426] border border-[#0a1a1c] hover:border-[#4ecdc4] transition-colors relative group"
+        >
+          <span className="text-sm">⊛</span>
+          {cart.items.length > 0 && (
+            <span className="absolute top-0.5 right-0.5 w-[7px] h-[7px] rounded-full bg-[#050b0c] border border-[#4ecdc4]" />
+          )}
+        </button>
+      </nav>
 
-        {/* MOBILE BOTTOM NAV */}
-        {isMobile && (
-          <nav style={{ height: "60px", flexShrink: 0, borderTop: "1px solid #0a1618",
-            display: "flex", alignItems: "stretch", background: "#040a0b", zIndex: 10 }}>
-            {NAV.map((item, i) => (
-              <button key={item.id} onClick={() => navigate(i)}
-                style={{ flex: 1, background: "none", border: "none", cursor: "pointer",
-                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px",
-                  borderTop: `2px solid ${activeIdx===i?"#4ecdc4":"transparent"}`,
-                  transition: "border-color 0.3s" }}>
-                <span style={{ fontSize: "0.9rem", color: activeIdx===i?"#4ecdc4":"#152426", transition: "color 0.3s" }}>{item.icon}</span>
-                <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.36rem", letterSpacing: "0.15em",
-                  textTransform: "uppercase", color: activeIdx===i?"#4ecdc4":"#101e20", transition: "color 0.3s" }}>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        )}
+      {/* PANELS WRAPPER */}
+      <div className="flex-1 relative overflow-hidden">
+        
+        {/* TOP RIGHT INDICATOR */}
+        <div className="absolute top-5 right-5 z-30 flex items-center gap-3">
+          <span className="font-mono text-[0.48rem] tracking-[0.28em] text-[#0d1e20] uppercase hidden md:inline-block">
+            {NAV[activeIdx].label}
+          </span>
+          <span className="font-mono text-[0.48rem] tracking-[0.2em] text-[#0a1618]">
+            {String(activeIdx + 1).padStart(2, "0")} / {String(NAV.length).padStart(2, "0")}
+          </span>
+          
+          {/* MOBILE CART ICON */}
+          <button 
+            onClick={() => setCartOpen(true)}
+            className="md:hidden w-[30px] h-[30px] flex items-center justify-center bg-transparent border border-[#0a1618] text-[#152426] hover:border-[#4ecdc4] hover:text-[#4ecdc4] transition-colors relative"
+          >
+            <span className="text-xs">⊛</span>
+            {cart.items.length > 0 && (
+              <span className="absolute top-0.5 right-0.5 w-[5px] h-[5px] rounded-full bg-[#4ecdc4]" />
+            )}
+          </button>
+        </div>
+
+        {/* PANELS */}
+        {PANELS.map((panel, i) => (
+          <div 
+            key={i} 
+            ref={(el) => (panelRefs.current[i] = el)}
+            className="absolute inset-0 overflow-hidden bg-[#050b0c]"
+            style={{ 
+              opacity: i === 0 ? 1 : 0, 
+              zIndex: i === 0 ? 1 : 0,
+            }}
+          >
+            {panel}
+          </div>
+        ))}
       </div>
 
+      {/* MOBILE BOTTOM NAV (flex on mobile, hidden on md+) */}
+      <nav className="flex md:hidden h-[60px] shrink-0 border-t border-[#0a1618] items-stretch bg-[#040a0b] relative z-20">
+        {NAV.map((item, i) => (
+          <button 
+            key={item.id} 
+            onClick={() => navigate(i)}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 border-t-2 transition-colors duration-300 ${activeIdx === i ? "border-[#4ecdc4]" : "border-transparent"}`}
+          >
+            <span className="text-xl text-[#4ecdc4]">{item.icon}</span>
+            <span className="font-mono text-[0.5rem] tracking-[0.15em] uppercase text-[#4ecdc4]">
+              {item.label}
+            </span>
+          </button>
+        ))}
+      </nav>
+
       <CartDrawer cart={cart} open={cartOpen} onClose={() => setCartOpen(false)} />
-    </>
+    </div>
   );
 }
